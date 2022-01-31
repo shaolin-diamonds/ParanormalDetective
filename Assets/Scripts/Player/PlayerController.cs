@@ -11,6 +11,15 @@ public class PlayerController : MonoBehaviour
     // getting input to move the player
     private Vector2 input;
 
+    // reference to Animator controller
+    private Animator animator;
+
+    // we use the reference to the Animator in the Awake function 
+    private void Awake()
+    {
+        animator = GetComponent<Animator>();
+    }
+
     private void Update()
     {
         // if player not moving
@@ -27,6 +36,11 @@ public class PlayerController : MonoBehaviour
             // if input is not zero
             if (input != Vector2.zero)
             {
+                // if the input is not zero, then we set the moveX and moveY parameters from the Animator
+                animator.SetFloat("moveX", input.x);
+                animator.SetFloat("moveY", input.y);
+                // since we are already setting x, y if input is not zero the player will stay in previous animation 
+
                 // calculate the target position to which the player should move
                 var targetPos = transform.position;
                 // current position of the player plus the input
@@ -36,8 +50,10 @@ public class PlayerController : MonoBehaviour
                 // use the Coroutine function we created below
                 StartCoroutine(Move(targetPos));
             }
-
         }
+
+        // set isMoving variable to Animator at end of update function
+        animator.SetBool("isMoving", isMoving);
     }
 
     // write Coroutine function to move player from current position to target position
