@@ -11,6 +11,9 @@ public class PlayerController : MonoBehaviour
     // getting input to move the player
     private Vector2 input;
 
+    // reference to layer for the function to check if target position is walkable
+    public LayerMask solidObjectsLayer;
+
     // reference to Animator controller
     private Animator animator;
 
@@ -47,8 +50,12 @@ public class PlayerController : MonoBehaviour
                 targetPos.x += input.x;
                 targetPos.y += input.y;
 
-                // use the Coroutine function we created below
-                StartCoroutine(Move(targetPos));
+                // can only call Move() Coroutine IfWalkable is true
+                if (IsWalkable(targetPos))
+                {
+                    // use the Move() Coroutine function we created
+                    StartCoroutine(Move(targetPos));
+                }
             }
         }
 
@@ -76,5 +83,24 @@ public class PlayerController : MonoBehaviour
         transform.position = targetPos;
 
         isMoving = false;
+    }
+
+    // before we call the Coroutine to move the player, we have to check if targetPos is a walkable tile
+    // this function will check if the target position is walkable
+    private bool IsWalkable(Vector3 targetPos)
+    {
+        // use Physics2D.OverlapCirlce() to check if there is solid object at the target position
+        // first parameter is position need to check
+        // second parameter is the radius of circle need to check (tile is 1 unit so using 0.2f, also to give some perspective to player)
+        // third parameter we can pass the layer of the object we want to check
+        if (Physics2D.OverlapCircle(targetPos, 0.2f, solidObjectsLayer) != null)
+        {
+            // if not null, it means there is a solid object in the target position
+            // which means the tile is not walkable and we return false
+            return false;
+        }
+
+        // otherwise we return true
+        return true;
     }
 }
